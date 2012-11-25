@@ -5,22 +5,25 @@ import java.io.ObjectInputStream;
 import java.net.Socket;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.DefaultListModel;
 import zeand.chat.objects.Message;
+import zeand.chat.objects.User;
 
 /**
  *
  * @author Aditya Kresna Permana
  */
 public class ReceiverThreads extends Thread {
-
+    private Receiver parent = null;
     private boolean is_interupted = false;
     private Socket socketClient = null;
     private static ObjectInputStream OIS = null;
-    private static int SLEEPTIME = 2000;
     private Message msg = null;
+    private User usr = null;
 
-    public ReceiverThreads(Socket socketClient) {
+    public ReceiverThreads(Receiver parent, Socket socketClient) {
         super("Server Thread");
+        this.parent = parent;
         this.socketClient = socketClient;
     }
 
@@ -36,8 +39,10 @@ public class ReceiverThreads extends Thread {
             /*
              * Casting and Reading object
              */
-            msg = (Message) OIS.readObject();
-
+            usr = (User) OIS.readObject();
+            
+            DefaultListModel listModel = (DefaultListModel) parent.listFriends.getModel();
+            listModel.addElement(usr.getOwner());
 
         } catch (IOException ex) {
             Logger.getLogger(ReceiverThreads.class.getName()).log(Level.SEVERE, null, ex);

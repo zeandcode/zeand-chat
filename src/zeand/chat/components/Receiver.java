@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.JList;
 import zeand.chat.objects.Message;
 
 /**
@@ -19,9 +20,18 @@ import zeand.chat.objects.Message;
  */
 public class Receiver extends Thread{
 
+    protected JList listFriends = null;
     private static int SRV_PORT = 1806;
     public boolean listening = true;
     private List<ReceiverThreads> threadLists = new ArrayList<ReceiverThreads>();
+
+    public Receiver(JList listFriends) {
+        this.listFriends = listFriends;
+        
+        
+    }
+    
+    
 
     /*
      * Running server and starting accept clients with thread
@@ -39,7 +49,7 @@ public class Receiver extends Thread{
              * listening clients with creating a new thread
              */
             while (this.listening) {
-                ReceiverThreads st = new ReceiverThreads(socketServer.accept());
+                ReceiverThreads st = new ReceiverThreads(this, socketServer.accept());
                 st.start();
                 threadLists.add(st);
             }
@@ -60,5 +70,13 @@ public class Receiver extends Thread{
     
     public Message getMessage(int clientNumber){
         return this.threadLists.get(clientNumber - 1).getMessage();
+    }
+
+    public static int getSRV_PORT() {
+        return SRV_PORT;
+    }
+
+    public static void setSRV_PORT(int SRV_PORT) {
+        Receiver.SRV_PORT = SRV_PORT;
     }
 }

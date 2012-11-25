@@ -11,6 +11,7 @@ import java.net.UnknownHostException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import zeand.chat.objects.Message;
+import zeand.chat.objects.User;
 
 /**
  *
@@ -18,37 +19,62 @@ import zeand.chat.objects.Message;
  */
 public class Sender {
 
-    private static String SRV_IP = "127.0.0.1";
-    private static int SRV_PORT = 1806;
-    private static ObjectOutputStream OOS = null;
+    private User u = null;
+    private ObjectOutputStream OOS = null;
+    private String SRV_IP = "127.0.0.1";
+    private int SRV_PORT = 1806;
 
-    public static void main(String args[]) {
+    public Sender(User u) {
+        this.u = u;
+    }
+
+    public String getSRV_IP() {
+        return SRV_IP;
+    }
+
+    public void setSRV_IP(String SRV_IP) {
+        this.SRV_IP = SRV_IP;
+    }
+
+    public int getSRV_PORT() {
+        return SRV_PORT;
+    }
+
+    public void setSRV_PORT(int SRV_PORT) {
+        this.SRV_PORT = SRV_PORT;
+    }
+
+    public void run() {
         try {
             /*
              * Creating socket Client
              */
             Socket socketClient = new Socket(SRV_IP, SRV_PORT);
-
+            
             /*
              * Creating a Stream for sending an object
              */
             OOS = new ObjectOutputStream(socketClient.getOutputStream());
             
             /*
-             * Creating an object and sending over stream
+             * Sending user first
              */
-            Message m = new Message("Test Message one");
-            OOS.writeObject(m);
-            
-            /*
-             * Output message
-             */
-//            System.out.println("Sending objects...");
+            OOS.writeObject(u);
         } catch (UnknownHostException ex) {
             Logger.getLogger(Sender.class.getName()).log(Level.SEVERE, null, ex);
         } catch (IOException ex) {
             Logger.getLogger(Sender.class.getName()).log(Level.SEVERE, null, ex);
         }
-            
+    }
+
+    public void send(Message m) throws IOException {
+        /*
+         * Creating an object and sending over stream
+         */
+        OOS.writeObject(m);
+    }
+    
+    public static void main(String args[]){
+        new Sender(new User("Aditya", "localhost", "mac")).run();
     }
 }
